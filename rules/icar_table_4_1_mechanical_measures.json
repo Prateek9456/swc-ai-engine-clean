@@ -1,0 +1,129 @@
+[
+  {
+    "measure": "Contour bunding",
+    "slope_max": 6,
+    "soil_depth": ["SHALLOW", "MEDIUM", "DEEP"],
+    "rainfall_max": 800,
+    "land_use": ["SMALL_MILLETS", "PULSES", "OILSEEDS", "COARSE_GRAINS", "ROOT_CROPS"]
+  },
+  {
+    "measure": "Contour bunding",
+    "slope_max": 6,
+    "soil_depth": ["SHALLOW", "MEDIUM", "DEEP"],
+    "rainfall_range": [800, 1500],
+    "land_use": ["SMALL_MILLETS", "PULSES", "OILSEEDS", "COARSE_GRAINS", "ROOT_CROPS", "VEGETABLES", "WHEAT"]
+  },
+  {
+    "measure": "Graded bunding",
+    "slope_max": 6,
+    "soil_depth": ["SHALLOW"],
+    "rainfall_max": 800,
+    "land_use": ["SMALL_MILLETS", "PULSES", "OILSEEDS", "COARSE_GRAINS"]
+  },
+  {
+    "measure": "Contour terrace (stone pitched contour bund)",
+    "slope_range": [15, 35],
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_min": 1000,
+    "land_use": ["ROOT_CROPS", "VEGETABLES"]
+  },
+  {
+    "measure": "Bench terracing (level)",
+    "slope_max": 33,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_range": [2500, 3000],
+    "land_use": ["PADDY"]
+  },
+  {
+    "measure": "Bench terracing (level)",
+    "slope_max": 33,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_max": 2500,
+    "land_use": ["SMALL_MILLETS", "PULSES", "OILSEEDS", "COARSE_GRAINS", "VEGETABLES"]
+  },
+  {
+    "measure": "Bench terracing (inward sloping)",
+    "slope_max": 33,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "land_use": ["POTATO", "VEGETABLES", "MAIZE", "OATS"]
+  },
+  {
+    "measure": "Bench terracing (outward sloping)",
+    "slope_max": 33,
+    "soil_depth": ["SHALLOW"],
+    "rainfall_max": 1200,
+    "land_use": ["SMALL_MILLETS", "OATS", "BARLEY"]
+  },
+  {
+    "measure": "Puertorican type terraces (vegetative barrier)",
+    "slope_max": 12,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_max": 1500,
+    "land_use": ["ROOT_CROPS", "VEGETABLES", "OATS", "SMALL_MILLETS"]
+  },
+  {
+    "measure": "Puertorican type terraces (mechanical barrier)",
+    "slope_max": 12,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_max": 1500,
+    "land_use": ["ROOT_CROPS", "VEGETABLES", "OATS", "SMALL_MILLETS"]
+  },
+  {
+    "measure": "Contour trenches (continuous)",
+    "slope_max": 8,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_max": 1500,
+    "land_use": ["TAPIOCA", "GINGER", "TURMERIC"]
+  },
+  {
+    "measure": "Contour trenches (staggered)",
+    "slope_max": 8,
+    "soil_depth": ["SHALLOW"],
+    "rainfall_max": 800,
+    "land_use": ["PAPAYA", "BANANA"]
+  },
+  {
+    "measure": "Contour trenches (staggered)",
+    "slope_max": 33,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "drainage": "WELL_DRAINED",
+    "rainfall_max": 2000,
+    "land_use": ["TEA", "COFFEE", "ARECANUT", "COCONUT", "BLACK_PEPPER", "NUTMEG", "CINNAMON", "PAPAYA", "BANANA"]
+  },
+  {
+    "measure": "Graded trenches",
+    "slope_max": 33,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "drainage": "WELL_DRAINED",
+    "rainfall_range": [2000, 3000],
+    "land_use": ["TEA", "COFFEE", "ARECANUT", "COCONUT", "BLACK_PEPPER", "NUTMEG", "CINNAMON", "PAPAYA", "BANANA"]
+  },
+  {
+    "measure": "Conservation bench terracing",
+    "slope_max": 10,
+    "soil_depth": ["MEDIUM", "DEEP"],
+    "rainfall_range": [1200, 2000],
+    "land_use": ["PADDY", "MAIZE"]
+  },
+  {
+    "measure": "Zing terracing",
+    "slope_max": 10,
+    "soil_depth": ["SHALLOW", "MEDIUM"],
+    "rainfall_range": [1200, 2000],
+    "land_use": ["PADDY", "COVER_CROP"]
+  },
+  {
+    "measure": "Stone wall (contour)",
+    "slope_max": 33,
+    "soil_depth": ["SHALLOW", "MEDIUM"],
+    "rainfall_max": 1500,
+    "land_use": ["TEA", "COFFEE", "SPICES"]
+  },
+  {
+    "measure": "Stone wall (graded)",
+    "slope_max": 33,
+    "soil_depth": ["SHALLOW", "MEDIUM"],
+    "rainfall_range": [1500, 2500],
+    "land_use": ["TEA", "COFFEE", "SPICES"]
+  }
+]

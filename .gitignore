@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+
+# Local raster data (DO NOT COMMIT)
+data/landcover/*.tif
+data/landcover/**/*.tif
+
+# OS
+.DS_Store
+Thumbs.db

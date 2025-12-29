@@ -1,0 +1,53 @@
+[
+  {
+    "condition": {
+      "slope": ">15",
+      "rainfall": ">1500"
+    },
+    "measure": "Bench Terracing",
+    "priority": "High",
+    "explanation": "Steep slopes with very high rainfall cause severe runoff and soil loss. Bench terracing reduces slope length and controls erosion."
+  },
+  {
+    "condition": {
+      "slope": "8-15",
+      "rainfall": ">1000"
+    },
+    "measure": "Contour Bunding",
+    "priority": "Medium",
+    "explanation": "Moderate slopes with high rainfall benefit from contour bunds that slow runoff and increase water infiltration."
+  },
+  {
+    "condition": {
+      "slope": "3-8"
+    },
+    "measure": "Contour Farming",
+    "priority": "Medium",
+    "explanation": "Gentle slopes can be protected by farming along contour lines to reduce runoff velocity."
+  },
+  {
+    "condition": {
+      "slope": "<3"
+    },
+    "measure": "Mulching and Cover Crops",
+    "priority": "Low",
+    "explanation": "Flat lands experience low erosion risk; organic cover helps protect topsoil and retain moisture."
+  },
+  {
+    "condition": {
+      "soil_type": "Sandy",
+      "erosion_risk": "High"
+    },
+    "measure": "Vegetative Barriers",
+    "priority": "High",
+    "explanation": "Sandy soils are highly erodible; vegetative barriers help stabilize soil and reduce wind and water erosion."
+  },
+  {
+    "condition": {
+      "erosion_risk": "Very High"
+    },
+    "measure": "Integrated Watershed Management",
+    "priority": "Critical",
+    "explanation": "Very high erosion risk areas require a combination of structural and vegetative measures at watershed level."
+  }
+]
