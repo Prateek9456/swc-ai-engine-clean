@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analysis Results</title>
+
+<style>
+:root{
+  --primary:#047857;
+  --primary-dark:#065f46;
+  --primary-light:#d1fae5;
+  --surface:#ffffff;
+  --background:#f8fafc;
+  --border:#e2e8f0;
+  --text-primary:#0f172a;
+  --text-secondary:#64748b;
+  --text-tertiary:#94a3b8;
+  --success:#10b981;
+  --success-light:#f0fdf4;
+  --warning:#f59e0b;
+  --warning-bg:#fffbeb;
+  --warning-border:#fde68a;
+  --error:#ef4444;
+  --info:#3b82f6;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+body{
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background: var(--background);
+  padding: 24px;
+  margin: 0;
+  line-height: 1.6;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container{
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--surface);
+  padding: 48px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+h1{
+  text-align: center;
+  font-size: 32px;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.subtitle{
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* STATUS CARDS */
+.cards{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.card{
+  background: linear-gradient(135deg, #f0fdfa 0%, #f0fdf4 100%);
+  border: 1px solid var(--primary-light);
+  border-radius: 12px;
+  padding: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover{
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card:hover::before{
+  opacity: 1;
+}
+
+.card-title{
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-value{
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+/* NO RECOMMENDATIONS BOX */
+.no-recommendations{
+  background: var(--success-light);
+  border: 1px solid #86efac;
+  border-left: 5px solid var(--success);
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-recommendations-icon{
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.no-recommendations h3{
+  color: var(--success);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.no-recommendations p{
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 12px 0;
+}
+
+.no-recommendations .highlight{
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* SECTIONS */
+.section{
+  margin-top: 48px;
+}
+
+.section h2{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.list{
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.item{
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--surface);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.item:hover{
+  border-left-color: var(--success);
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.badge{
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 15px;
+  box-shadow: var(--shadow-sm);
+}
+
+.item > div:last-child{
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* IMAGES */
+.grid{
+  margin-top: 24px;
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+}
+
+.grid.single-item{
+  grid-template-columns: 1fr;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid.two-items{
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 800px;
+}
+
+.grid.multi-items{
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 960px;
+}
+
+@media (max-width: 768px) {
+  .grid.two-items,
+  .grid.multi-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .container{
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid{
+    grid-template-columns: 1fr !important;
+  }
+  
+  .container{
+    padding: 24px 16px;
+  }
+  
+  h1{
+    font-size: 24px;
+  }
+}
+
+.img-card{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.img-card:hover{
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: var(--primary);
+}
+
+.img-card img{
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+
+.img-card:hover img{
+  transform: scale(1.05);
+}
+
+.grid.single-item .img-card img{
+  aspect-ratio: 16/9;
+}
+
+.caption{
+  text-align: center;
+  padding: 20px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  background: var(--surface);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* BUTTONS */
+.actions{
+  margin-top: 48px;
+  text-align: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn{
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.primary{
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-color: var(--primary);
+}
+
+.primary:hover{
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #064e3b 100%);
+  border-color: var(--primary-dark);
+}
+
+.outline{
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.outline:hover{
+  background: var(--primary-light);
+}
+
+/* MODAL */
+.modal{
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn{
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-box{
+  background: var(--surface);
+  max-width: 540px;
+  width: 90%;
+  margin: 0;
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp{
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-box h3{
+  color: var(--text-primary);
+  font-size: 22px;
+  margin: 0 0 24px 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.02em;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.modal-box p{
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-box p:last-of-type{
+  border-bottom: none;
+  margin-bottom: 20px;
+}
+
+.modal-box p strong{
+  color: var(--text-secondary);
+  font-weight: 600;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.modal-box .value{
+  color: var(--primary);
+  font-weight: 600;
+  text-align: right;
+  font-size: 15px;
+}
+
+/* SUCCESS BOX IN MODAL */
+.modal-box .success-box{
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--success-light);
+  border-radius: 10px;
+  border: 1px solid #86efac;
+}
+
+.modal-box .success-box p{
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--primary);
+  font-size: 14px;
+  display: block;
+  line-height: 1.6;
+}
+
+.modal-box .success-box p strong{
+  color: var(--primary);
+  font-weight: 700;
+}
+</style>
+</head>
+
+<body>
+
+<%
+/* ===== SAFE NORMALIZATION (NO ERRORS EVER) ===== */
+const erosion = erosionRisk || null;
+const factors = factorsData || {};
+const measures = recommendations || [];
+
+/* Extract the reason string from backend - check both 'reason' and 'land_use' */
+const backendReason = (factors.reason || "").toLowerCase();
+const landUse = (factors.land_use || "").toLowerCase();
+
+/* Combine both for more reliable detection */
+const combinedReason = backendReason + " " + landUse;
+%>
+
+<div class="container">
+
+<h1>Result Analysis</h1>
+<p class="subtitle">Soil & Water Conservation Decision Support System</p>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-title">Erosion Risk</div>
+    <div class="card-value">
+      <%= erosion?.level || "N/A" %>
+    </div>
+  </div>
+</div>
+
+<% if (measures.length === 0) { %>
+
+  <div class="no-recommendations">
+    <span class="no-recommendations-icon">✅</span>
+    <h3>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+        <path d="M12 8v4"/>
+        <path d="M12 16h.01"/>
+      </svg>
+      No Conservation Measures Required
+    </h3>
+
+    <% 
+      let reasonTitle = "Low Erosion Risk – Natural Conditions Sufficient";
+      let reasonText = "Based on terrain, soil type, existing vegetation, and other natural factors at this location, the risk of soil erosion is very low. No additional conservation measures are needed at this time.";
+
+      // Check backend reason string - now checking combinedReason for better detection
+      if (combinedReason.includes("water")) {
+        reasonTitle = "This is a Water Body";
+        reasonText = "The selected location is a river, lake, pond, reservoir, or other water body. Since there is no soil to erode in water-covered areas, agricultural soil conservation practices do not apply here.";
+      } else if (combinedReason.includes("trees") || combinedReason.includes("forest")) {
+        reasonTitle = "This is Forest or Tree-Covered Land";
+        reasonText = "Dense tree cover and root systems naturally stabilize the soil and reduce rain impact. Forests provide excellent inherent protection against erosion, so no additional conservation measures are required.";
+      } else if (combinedReason.includes("rangeland") || combinedReason.includes("grazing") || combinedReason.includes("grassland")) {
+        reasonTitle = "This is Rangeland / Grassland";
+        reasonText = "Natural grass cover and absence of tillage prevent soil erosion effectively. Rangelands used for grazing already have sufficient vegetation to protect the soil.";
+      } else if (combinedReason.includes("built") || combinedReason.includes("urban") || combinedReason.includes("built_up")) {
+        reasonTitle = "This is a Built-up / Urban Area";
+        reasonText = "The location contains buildings, roads, or urban infrastructure. This land is not used for agriculture, therefore soil conservation recommendations for farming do not apply.";
+      } else if (combinedReason.includes("barren") || combinedReason.includes("wasteland")) {
+        reasonTitle = "This is Non-Arable or Barren Land";
+        reasonText = "The land is classified as non-arable (e.g., rocky outcrops, desert, mountainous, or uncultivable wasteland). It is not suitable for crop cultivation, so agricultural soil conservation measures are not applicable.";
+      } else if (combinedReason.includes("non-arable") || combinedReason.includes("non_arable")) {
+        // Generic non-arable handler if specific type not detected
+        reasonTitle = "This is Non-Arable Land";
+        reasonText = "This location is classified as non-arable land, meaning it is not suitable for agricultural cultivation. Since this land cannot be farmed, agricultural soil conservation measures do not apply.";
+      }
+    %>
+
+    <p><strong class="highlight"><%= reasonTitle %></strong></p>
+    <p><%= reasonText %></p>
+    <p style="margin-top:20px; font-size:15px; color:var(--text-secondary);">
+      Your location is safe under current conditions. Continue preserving natural vegetation and land cover where possible to maintain this protection.
+    </p>
+    
+    <!-- Debug info (remove in production) -->
+    <% if (backendReason || landUse) { %>
+      <div style="margin-top:20px; padding:12px; background:#f1f5f9; border-radius:8px; font-size:13px; color:#64748b; text-align:left;">
+        <strong>Detection Info:</strong><br>
+        Reason: <%= backendReason || 'Not provided' %><br>
+        Land Use: <%= landUse || 'Not provided' %>
+      </div>
+    <% } %>
+  </div>
+
+<% } else { %>
+
+  <!-- Normal recommendations section -->
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      Conservation Recommendations
+    </h2>
+
+    <div class="list">
+      <% measures.forEach((m,i)=>{ %>
+        <div class="item">
+          <div class="badge"><%= i+1 %></div>
+          <div><%= m %></div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn outline" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        View Analysis Details
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Recommended Techniques (Visual)
+    </h2>
+
+    <div class="grid" id="imgGrid"></div>
+  </div>
+
+<% } %>
+
+<div class="actions">
+  <button class="btn primary" onclick="location.href='/dss'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Run Another Analysis
+  </button>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <h3>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      Analysis Details
+    </h3>
+    
+    <p>
+      <strong>Land Slope:</strong> 
+      <span class="value">
+        <% if (factors.slope_percent && factors.slope_percent !== 'N/A') { %>
+          <%= factors.slope_percent %>% 
+          <% if (parseFloat(factors.slope_percent) < 3) { %>(Flat land)<% } 
+             else if (parseFloat(factors.slope_percent) < 8) { %>(Gentle slope)<% } 
+             else if (parseFloat(factors.slope_percent) < 15) { %>(Moderate slope)<% } 
+             else { %>(Steep slope)<% } %>
+        <% } else { %>Not provided<% } %>
+      </span>
+    </p>
+    
+    <p>
+      <strong>Annual Rainfall:</strong> 
+      <span class="value">
+        <% if (factors.rainfall_mm && factors.rainfall_mm !== 'N/A') { %>
+          <%= factors.rainfall_mm %> mm
+          <% if (parseFloat(factors.rainfall_mm) < 600) { %>(Low rainfall)<% } 
+             else if (parseFloat(factors.rainfall_mm) < 1200) { %>(Moderate rainfall)<% } 
+             else { %>(High rainfall)<% } %>
+        <% } else { %>Not provided<% } %>
+      </span>
+    </p>
+    
+    <p>
+      <strong>Soil Depth:</strong> 
+      <span class="value">
+        <% if (factors.soil_depth && factors.soil_depth !== 'N/A') { %>
+          <%= factors.soil_depth === 'SHALLOW' ? 'Shallow (Less than 50cm)' : 
+              factors.soil_depth === 'MODERATE' ? 'Moderate (50-100cm)' : 
+              factors.soil_depth === 'DEEP' ? 'Deep (More than 100cm)' : factors.soil_depth %>
+        <% } else { %>Not provided<% } %>
+      </span>
+    </p>
+    
+    <p>
+      <strong>Water Drainage:</strong> 
+      <span class="value">
+        <% if (factors.drainage && factors.drainage !== 'N/A') { %>
+          <%= factors.drainage === 'WELL_DRAINED' ? 'Well Drained (Water flows easily)' : 
+              factors.drainage === 'MODERATE' ? 'Moderate (Some water stays)' : 
+              factors.drainage === 'POOR' ? 'Poor (Water stays long)' : factors.drainage %>
+        <% } else { %>Not provided<% } %>
+      </span>
+    </p>
+    
+    <p>
+      <strong>Land Use Type:</strong> 
+      <span class="value">
+        <% if (factors.land_use && factors.land_use !== 'N/A') { %>
+          <%= factors.land_use === 'PADDY' || factors.land_use === 'paddy' ? 'Paddy/Rice Field' : 
+              factors.land_use === 'CROP' || factors.land_use === 'crop' ? 'Other Crops' : 
+              factors.land_use === 'PLANTATION' || factors.land_use === 'plantation' ? 'Plantation/Orchard' : 
+              factors.land_use === 'FALLOW' || factors.land_use === 'fallow' ? 'Fallow (Not used now)' : 
+              factors.land_use === 'RANGELAND' || factors.land_use === 'rangeland' ? 'Rangeland (Grazing)' : 
+              factors.land_use === 'TREES' || factors.land_use === 'trees' ? 'Forest/Trees' : 
+              factors.land_use === 'BUILT_UP' || factors.land_use === 'built_up' ? 'Built-up Area' : 
+              factors.land_use === 'WATER' || factors.land_use === 'water' ? 'Water Body' : factors.land_use %>
+        <% } else { %>Not provided<% } %>
+      </span>
+    </p>
+    
+    <div class="success-box">
+      <p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <strong>Recommendations Generated:</strong> Based on your land details above, we have suggested <%= measures.length %> soil conservation technique<%= measures.length > 1 ? 's' : '' %> to protect your soil and improve farming.
+      </p>
+    </div>
+    
+    <div style="margin-top:24px; text-align:center;">
+      <button class="btn primary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const measures = <%- JSON.stringify(measures) %>;
+
+const imageMap = {
+  "zing terracing": "/images/zing_terracing.jpg",
+  "contour bunding": "/images/contour_bunding.jpg",
+  "graded bunding": "/images/graded-bunding.jpg",
+  "stone wall (contour)": "/images/stone_wall_contour.jpg",
+  "stone wall (graded)": "/images/stone_wall_graded.jpg",
+  "bench terracing (outward sloping)": "/images/bench_terracing.jpg",
+  "bench terracing (inward sloping)": "/images/bench_terracing.jpg",
+  "contour trenches (staggered)": "/images/vegetative_barriers.jpg",
+  "contour trenches": "/images/vegetative_barriers.jpg"
+};
+
+const grid = document.getElementById("imgGrid");
+const usedImages = new Set();
+
+if (measures.length > 0) {
+  measures.forEach(m => {
+    const t = m.toLowerCase();
+    let src = "/images/vegetative_barriers.jpg";
+
+    if (imageMap[t]) {
+      src = imageMap[t];
+    } else {
+      for (const k in imageMap) {
+        if (t.includes(k) || k.includes(t.replace(/\s*\([^)]*\)/g, '').trim())) {
+          src = imageMap[k];
+          break;
+        }
+      }
+    }
+
+    if (usedImages.has(src + m)) return;
+    usedImages.add(src + m);
+
+    const d = document.createElement("div");
+    d.className = "img-card";
+    d.innerHTML = `
+      <img src="${src}" alt="${m}">
+      <div class="caption">${m}</div>
+    `;
+    grid.appendChild(d);
+  });
+
+  if (grid.children.length === 1) {
+    grid.classList.add('single-item');
+  } else if (grid.children.length === 2) {
+    grid.classList.add('two-items');
+  } else if (grid.children.length > 2) {
+    grid.classList.add('multi-items');
+  }
+}
+
+function openModal(){ 
+  document.getElementById("modal").style.display = "flex"; 
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(){ 
+  document.getElementById("modal").style.display = "none"; 
+  document.body.style.overflow = "auto";
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+
+</body>
+</html>

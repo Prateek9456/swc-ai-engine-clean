@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Authentication</title>
+  <style>
+    body {
+      font-family: system-ui;
+      background: #eef7f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      width: 380px;
+      box-shadow: 0 15px 40px rgba(0,0,0,.1);
+    }
+    h2 { text-align: center; color: #059669; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #059669;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .divider {
+      text-align: center;
+      margin: 15px 0;
+      color: #888;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Login</h2>
+
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <form method="POST" action="/login">
+    <input name="username" placeholder="Username" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button>Login</button>
+  </form>
+
+  <div class="divider">OR</div>
+
+  <h2>Create Account</h2>
+  <form method="POST" action="/register">
+    <input name="username" placeholder="New Username" required />
+    <input type="password" name="password" placeholder="New Password" required />
+    <button>Create Account</button>
+  </form>
+</div>
+
+</body>
+</html>

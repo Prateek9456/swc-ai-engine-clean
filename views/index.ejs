@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Soil & Water Conservation DSS - ICAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Inter', 'Segoe UI', 'Source Sans Pro', sans-serif; 
+      background: #f8faf9;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    
+    /* Header Section - IMPROVED */
+    .header {
+      background-image: url('/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #047857;
+      color: white;
+      padding: 3.5rem 1.5rem;
+      min-height: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* FIXED: Reduced opacity from 0.75/0.7 to 0.35/0.25 for better image visibility */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(4, 120, 87, 0.35) 0%, rgba(5, 150, 105, 0.25) 100%);
+      z-index: 1;
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .logo-container {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 12px;
+      padding: 18px 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      max-width: 90%;
+    }
+    
+    .logo-container img {
+      width: 100%;
+      max-width: 360px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    
+    .logo-text {
+      display: none;
+    }
+    
+    .org-info {
+      display: none;
+    }
+    
+    .main-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0.75rem 0;
+      text-align: center;
+      letter-spacing: -0.03em;
+      text-shadow: 2px 4px 12px rgba(0,0,0,0.3);
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 400;
+      opacity: 0.98;
+      margin-bottom: 2rem;
+      text-shadow: 1px 2px 8px rgba(0,0,0,0.25);
+      letter-spacing: 0.015em;
+    }
+    
+    /* Feature badges removed as requested */
+    .feature-badges {
+      display: none;
+    }
+    
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    /* Controls Section */
+    .section {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+    }
+    
+    .section:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #047857;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid #10b981;
+      letter-spacing: -0.02em;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+    
+    select {
+      width: 100%;
+      max-width: 450px;
+      padding: 1rem 1.25rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: linear-gradient(to bottom, #ffffff, #f9fafb);
+      cursor: pointer;
+      transition: all 0.3s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 20px;
+      padding-right: 3rem;
+    }
+    
+    select:hover { 
+      border-color: #10b981; 
+      box-shadow: 0 2px 8px rgba(16,185,129,0.15);
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: #059669;
+      box-shadow: 0 0 0 4px rgba(5,150,105,0.15);
+      background: white;
+    }
+    
+    /* Map Section */
+    .map-container {
+      position: relative;
+      height: 500px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    #mapDiv { height: 100%; width: 100%; }
+    
+    .map-search {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 400px;
+      z-index: 1000;
+    }
+    
+    .map-search input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    
+    .map-search input:focus {
+      outline: none;
+      box-shadow: 0 4px 16px rgba(5,150,105,0.25);
+    }
+    
+    #suggestions {
+      background: white;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    
+    .suggestion-item:hover { background: #f0fdf4; }
+    .suggestion-item:last-child { border-bottom: none; }
+    
+    .locate-btn {
+      position: absolute;
+      bottom: 5.5rem;
+      right: 1rem;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+      transition: all 0.2s;
+    }
+    
+    .locate-btn:hover { transform: scale(1.08); }
+    
+    .map-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      gap: 0.25rem;
+      background: white;
+      padding: 0.25rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .toggle-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+    
+    .toggle-btn.active {
+      background: #10b981;
+      color: white;
+    }
+    
+    .location-info {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 320px;
+      z-index: 1000;
+      font-size: 0.85rem;
+    }
+    
+    .info-header {
+      font-weight: 600;
+      color: #047857;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-content { color: #475569; line-height: 1.6; }
+    #infoText { max-height: 80px; overflow-y: auto; }
+    .info-row { margin: 0.25rem 0; }
+    .info-label { font-weight: 600; color: #64748b; }
+    
+    /* Action Buttons */
+    .action-section {
+      text-align: center;
+      padding: 2rem 0;
+      position: relative;
+    }
+    
+    .submit-btn {
+      padding: 1rem 3rem;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+      transition: all 0.3s;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16,185,129,0.4);
+    }
+    
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Loading Spinner */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #10b981;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 1.2rem;
+      color: #047857;
+      font-weight: 600;
+    }
+    
+    /* Navigation */
+    .menu-btn, .help-btn {
+      position: fixed;
+      top: 1rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 2000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+      font-weight: 600;
+      color: #047857;
+    }
+    
+    .menu-btn { left: 1rem; }
+    .help-btn { right: 1rem; }
+    
+    .menu-btn:hover, .help-btn:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-1px);
+    }
+    
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: white;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+      z-index: 1999;
+      transition: left 0.3s;
+      overflow-y: auto;
+    }
+    
+    .side-menu.open { left: 0; }
+    
+    .menu-header {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .menu-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .menu-close:hover { background: rgba(255,255,255,0.3); }
+    
+    .menu-items { padding: 1rem; }
+    
+    .menu-item {
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+      color: #475569;
+      border-left: 3px solid transparent;
+    }
+    
+    .menu-item:hover {
+      background: #f0fdf4;
+      color: #047857;
+      border-left-color: #10b981;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .modal-overlay.active { display: flex; }
+    
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: slideUp 0.3s;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+      background: linear-gradient(135deg, #047857, #059669);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    
+    .modal-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .modal-content { padding: 2rem; }
+    
+    .help-section { margin-bottom: 2rem; }
+    
+    .help-section h3 {
+      color: #047857;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    
+    .help-section p {
+      color: #475569;
+      margin-bottom: 0.75rem;
+    }
+    
+    .help-section ol, .help-section ul {
+      color: #475569;
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    
+    .help-section li { margin-bottom: 0.5rem; }
+    
+    .tip-box {
+      background: #f0fdf4;
+      border-left: 4px solid #10b981;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+    
+    .tip-box strong { color: #047857; }
+    
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 1998;
+      display: none;
+    }
+    
+    .menu-overlay.active { display: block; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-title { font-size: 2.25rem; }
+      .subtitle { font-size: 1.1rem; }
+      .header { padding: 2.5rem 1rem; min-height: 350px; }
+      .section { padding: 1.5rem; }
+      .map-container { height: 400px; }
+      .location-info { max-width: 260px; font-size: 0.8rem; }
+      .map-search { width: 85%; }
+      .logo-container img { height: 55px; max-width: 350px; }
+      .feature-badge { padding: 0.6rem 1.25rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+<button class="help-btn" onclick="openHelp()">Help</button>
+
+<div class="menu-overlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="menu-header">
+    <span>📋 Menu</span>
+    <button class="menu-close" onclick="toggleMenu()">×</button>
+  </div>
+  <div class="menu-items">
+    <div class="menu-item" onclick="scrollToSection('controls')">
+      <span>Select Crop & Location</span>
+    </div>
+    <div class="menu-item" onclick="scrollToSection('map')">
+      <span>Interactive Map</span>
+    </div>
+    <div class="menu-item" onclick="openHelp()">
+      <span>User Guide</span>
+    </div>
+    <div class="menu-item" onclick="alert('Soil & Water Conservation DSS v1.0\n\nAdvanced Decision Support System for Sustainable Land Management\n\nDeveloped by Indian Council of Agricultural Research')">
+      <span>About</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="helpModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><span>📚</span><span>User Guide</span></div>
+      <button class="modal-close" onclick="closeHelp()">×</button>
+    </div>
+    <div class="modal-content">
+      <div class="help-section">
+        <h3>🎯 Getting Started</h3>
+        <p>The Soil & Water Conservation Decision Support System helps you analyze soil erosion risk and receive personalized conservation recommendations based on your location and crop type.</p>
+      </div>
+      <div class="help-section">
+        <h3>📍 Step 1: Select Your Location</h3>
+        <ol>
+          <li><strong>Use GPS:</strong> Click the 📍 button on the map to automatically detect your current location</li>
+          <li><strong>Search:</strong> Type a village, city, road, or landmark in the search bar above the map</li>
+          <li><strong>Click Map:</strong> Click directly on any location on the map to place a marker</li>
+        </ol>
+        <div class="tip-box">
+          <strong>Tip:</strong> Toggle between Street and Satellite views using the buttons in the top-right corner of the map for better visualization of your area.
+        </div>
+      </div>
+      <div class="help-section">
+        <h3>Step 2: Select Crop/Land Use</h3>
+        <p>Choose your crop type from the dropdown menu (Paddy, Wheat, or Maize). This helps provide accurate, crop-specific recommendations for soil and water conservation.</p>
+      </div>
+      <div class="help-section">
+        <h3>Step 3: Proceed with Analysis</h3>
+        <p>Click the "Proceed with Analysis" button to analyze erosion risk based on local topography, soil characteristics, rainfall patterns, and your selected crop type.</p>
+      </div>
+      <div class="help-section">
+        <h3>Using the Map</h3>
+        <p><strong>Location Details:</strong> Check the info box at the bottom-left of the map to see coordinates, road, area, city, district, and state information.</p>
+        <p><strong>Controls:</strong> Use +/− buttons to zoom, drag the map to pan, and toggle between map views.</p>
+      </div>
+      <div class="help-section">
+        <h3>Troubleshooting GPS</h3>
+        <ul>
+          <li>Ensure location services are enabled on your device</li>
+          <li>Allow location access when prompted by your browser</li>
+          <li>Make sure you're using a secure HTTPS connection</li>
+          <li>If GPS fails, use the search bar or click directly on the map</li>
+        </ul>
+      </div>
+      <div class="tip-box">
+        <strong>Remember:</strong> Accurate location selection and appropriate crop choice ensure you receive the most relevant conservation recommendations for your specific agricultural context.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Spinner Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Analyzing your location...</div>
+</div>
+
+<header class="header">
+  <div class="header-content">
+    <div class="logo-section">
+      <div class="logo-container">
+        <img src="/images/icar-logo.png" alt="ICAR Logo" 
+             onerror="this.style.display='none'">
+      </div>
+    </div>
+    <h1 class="main-title">GeoAgri Conserva</h1>
+    <p class="subtitle">Location-Driven Soil & Water Conservation DSS</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="section" id="controls">
+    <h2 class="section-title">Configuration</h2>
+    <div class="form-group">
+      <label class="form-label" for="landUse">Select Crop / Land Use</label>
+      <select id="landUse">
+        <option value="">Select Crop / Land Use</option>
+        <option value="PADDY">Paddy</option>
+        <option value="SMALL_MILLETS">Small Millets</option>
+        <option value="PULSES">Pulses</option>
+        <option value="OILSEEDS">Oilseeds</option>
+        <option value="COARSE_GRAINS">Coarse Grains</option>
+        <option value="ROOT_CROPS">Root Crops</option>
+        <option value="VEGETABLES">Vegetables</option>
+        <option value="PLANTATION">Plantation</option>
+        <option value="HORTICULTURE">Horticulture</option>
+        <option value="BARREN">Barren</option>
+      </select>
+    </div>
+    <input type="hidden" id="lat">
+    <input type="hidden" id="lon">
+  </div>
+
+  <div class="section" id="map">
+    <h2 class="section-title">Location Selection</h2>
+    <div class="map-container">
+      <div class="map-search">
+        <input id="locationSearch" placeholder="Search village, city, road, landmark…" />
+        <div id="suggestions"></div>
+      </div>
+      <button class="locate-btn" id="locateBtn" title="Use my location">📍</button>
+      <div class="map-toggle">
+        <button class="toggle-btn active" data-type="street">Street</button>
+        <button class="toggle-btn" data-type="hybrid">Satellite</button>
+      </div>
+      <div class="location-info">
+        <div class="info-header">Location Details</div>
+        <div class="info-content">
+          <div id="infoText">Click on map or use locate button to select location</div>
+        </div>
+      </div>
+      <div id="mapDiv"></div>
+    </div>
+  </div>
+
+  <div class="action-section">
+    <button class="submit-btn" onclick="submitAnalysis()">Proceed with Analysis</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  let map, marker, streetLayer, satelliteLayer, currentLayer = "street";
+  let searchTimeout;
+
+  window.onload = function() {
+    initMap();
+    initLocateButton();
+    initSearch();
+    initMapToggle();
+  };
+
+  function initMap() {
+    map = L.map("mapDiv", {zoomControl: true}).setView([22.5, 79], 5);
+    
+    const streetBase = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    });
+    const streetLabels = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19
+    });
+    streetLayer = L.layerGroup([streetBase, streetLabels]).addTo(map);
+    
+    const satelliteBase = L.tileLayer("https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+      maxZoom: 20
+    });
+    const hybridLabels = L.tileLayer("https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}", {
+      maxZoom: 20
+    });
+    satelliteLayer = L.layerGroup([satelliteBase, hybridLabels]);
+    
+    map.on("click", function(e) {
+      placeMarker(e.latlng.lat, e.latlng.lng);
+      fetchLocationDetails(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  function placeMarker(lat, lon) {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lon]).addTo(map);
+    document.getElementById("lat").value = lat;
+    document.getElementById("lon").value = lon;
+  }
+
+  async function fetchLocationDetails(lat, lon) {
+    const infoBox = document.getElementById("infoText");
+    infoBox.innerHTML = "Loading location details...";
+    
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=en&zoom=18&addressdetails=1`);
+      
+      if (!res.ok) throw new Error('Network response was not ok');
+      
+      const data = await res.json();
+      
+      if (data.address) {
+        const a = data.address;
+        let details = `<div class="info-row"><span class="info-label">Coordinates:</span> ${lat.toFixed(6)}, ${lon.toFixed(6)}</div>`;
+        if (a.road || a.street) details += `<div class="info-row"><span class="info-label">Road:</span> ${a.road || a.street}</div>`;
+        if (a.suburb || a.neighbourhood) details += `<div class="info-row"><span class="info-label">Area:</span> ${a.suburb || a.neighbourhood}</div>`;
+        if (a.village || a.town || a.city) details += `<div class="info-row"><span class="info-label">City:</span> ${a.village || a.town || a.city}</div>`;
+        if (a.state_district) details += `<div class="info-row"><span class="info-label">District:</span> ${a.state_district}</div>`;
+        if (a.state) details += `<div class="info-row"><span class="info-label">State:</span> ${a.state}</div>`;
+        if (a.postcode) details += `<div class="info-row"><span class="info-label">PIN:</span> ${a.postcode}</div>`;
+        infoBox.innerHTML = details;
+      } else {
+        infoBox.innerHTML = `<div class="info-row"><span class="info-label">Coordinates:</span> ${lat.toFixed(6)}, ${lon.toFixed(6)}</div>`;
+      }
+    } catch (error) {
+      console.error('Error fetching location:', error);
+      infoBox.innerHTML = `<div class="info-row"><span class="info-label">Coordinates:</span> ${lat.toFixed(6)}, ${lon.toFixed(6)}</div><div class="info-row">Could not fetch address details</div>`;
+    }
+  }
+
+  function initLocateButton() {
+    document.getElementById("locateBtn").addEventListener("click", function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            placeMarker(lat, lon);
+            map.setView([lat, lon], 15);
+            fetchLocationDetails(lat, lon);
+          },
+          function(error) {
+            alert("Unable to retrieve location. Please ensure location services are enabled and try again.");
+            console.error("Geolocation error:", error);
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    });
+  }
+
+  function initSearch() {
+    const searchInput = document.getElementById("locationSearch");
+    const suggestions = document.getElementById("suggestions");
+    
+    searchInput.addEventListener("input", function() {
+      clearTimeout(searchTimeout);
+      const query = searchInput.value.trim();
+      
+      if (query.length < 3) {
+        suggestions.innerHTML = "";
+        return;
+      }
+      
+      searchTimeout = setTimeout(async function() {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5&accept-language=en&addressdetails=1`);
+          
+          if (!res.ok) {
+            suggestions.innerHTML = '<div class="suggestion-item">Error fetching results</div>';
+            return;
+          }
+          
+          const data = await res.json();
+          
+          if (data.length === 0) {
+            suggestions.innerHTML = '<div class="suggestion-item">No results found</div>';
+            return;
+          }
+          
+          suggestions.innerHTML = data.map(item => 
+            `<div class="suggestion-item" onclick='selectLocation(${item.lat}, ${item.lon}, "${item.display_name.replace(/'/g, "\\'")}")'>${item.display_name}</div>`
+          ).join("");
+        } catch (error) {
+          console.error('Search error:', error);
+          suggestions.innerHTML = '<div class="suggestion-item">Error fetching results</div>';
+        }
+      }, 500);
+    });
+    
+    searchInput.addEventListener("focus", function() {
+      if (suggestions.innerHTML) {
+        suggestions.style.display = "block";
+      }
+    });
+    
+    document.addEventListener("click", function(e) {
+      if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.innerHTML = "";
+      }
+    });
+  }
+
+  function selectLocation(lat, lon, name) {
+    placeMarker(lat, lon);
+    map.setView([lat, lon], 15);
+    fetchLocationDetails(lat, lon);
+    document.getElementById("suggestions").innerHTML = "";
+    document.getElementById("locationSearch").value = name;
+  }
+
+  function initMapToggle() {
+    const toggleBtns = document.querySelectorAll(".toggle-btn");
+    
+    toggleBtns.forEach(btn => {
+      btn.addEventListener("click", function() {
+        toggleBtns.forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        
+        const mapType = this.getAttribute("data-type");
+        
+        if (mapType === "street") {
+          if (map.hasLayer(satelliteLayer)) {
+            map.removeLayer(satelliteLayer);
+          }
+          if (!map.hasLayer(streetLayer)) {
+            map.addLayer(streetLayer);
+          }
+        } else {
+          if (map.hasLayer(streetLayer)) {
+            map.removeLayer(streetLayer);
+          }
+          if (!map.hasLayer(satelliteLayer)) {
+            map.addLayer(satelliteLayer);
+          }
+        }
+      });
+    });
+  }
+
+  function toggleMenu() {
+    const menu = document.getElementById("sideMenu");
+    const overlay = document.querySelector(".menu-overlay");
+    menu.classList.toggle("open");
+    overlay.classList.toggle("active");
+  }
+
+  function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    toggleMenu();
+  }
+
+  function openHelp() {
+    document.getElementById("helpModal").classList.add("active");
+    if (document.getElementById("sideMenu").classList.contains("open")) {
+      toggleMenu();
+    }
+  }
+
+  function closeHelp() {
+    document.getElementById("helpModal").classList.remove("active");
+  }
+
+  function submitAnalysis() {
+    const lat = document.getElementById("lat").value;
+    const lon = document.getElementById("lon").value;
+    const landUse = document.getElementById("landUse").value;
+
+    if (!lat || !lon) {
+      alert("Please select a location on the map first.");
+      return;
+    }
+
+    if (!landUse) {
+      alert("Please select a crop/land use type.");
+      return;
+    }
+
+    // Show loading spinner
+    document.getElementById("loadingOverlay").style.display = "flex";
+    document.querySelector(".submit-btn").disabled = true;
+
+    // Submit to backend
+    fetch("/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lat: parseFloat(lat),
+        lon: parseFloat(lon),
+        landUse
+      })
+    })
+    .then(res => res.text())
+    .then(html => {
+      // Hide spinner before replacing page
+      document.getElementById("loadingOverlay").style.display = "none";
+      document.open();
+      document.write(html);
+      document.close();
+    })
+    .catch(err => {
+      document.getElementById("loadingOverlay").style.display = "none";
+      document.querySelector(".submit-btn").disabled = false;
+      alert("Analysis failed. Please try again.");
+      console.error(err);
+    });
+  }
+</script>
+
+</body>
+</html>
