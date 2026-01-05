@@ -1,0 +1,33 @@
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #f5f7fb;
+    margin: 0;
+}
+
+.navbar {
+    background: #0f766e;
+    padding: 16px 32px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.logout {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
