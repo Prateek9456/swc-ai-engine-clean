@@ -1,18 +1,25 @@
-def fetch_soil_depth_class(slope_percent, drainage):
+# geo/sensors/soil_depth_sensor.py
+
+def fetch_soil_depth_class(slope_percent):
     """
     Returns ICAR soil depth class:
-    SHALLOW / MEDIUM / DEEP
+    DEEP / MODERATE / SHALLOW
 
-    Derived using ICAR-consistent terrain interpretation.
+    Deterministic, ICAR-consistent physiography proxy.
+    Uses slope (%) only. Conservative by design.
     """
 
-    # ICAR: deep soils on gentle slopes with good drainage
-    if slope_percent < 6 and drainage in ["GOOD", "MODERATE"]:
+    if slope_percent is None:
+        # Conservative fallback
+        return "SHALLOW"
+
+    # ICAR: flat to very gently sloping alluvial plains
+    if slope_percent <= 3.0:
         return "DEEP"
 
-    # ICAR: medium soils on moderate slopes
-    if slope_percent < 15:
-        return "MEDIUM"
+    # ICAR: gently sloping to undulating terrain
+    if slope_percent <= 15.0:
+        return "MODERATE"
 
-    # ICAR: shallow soils on steep slopes
+    # ICAR: dissected / steeper terrain
     return "SHALLOW"
