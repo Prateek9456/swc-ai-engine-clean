@@ -7,7 +7,7 @@ from geo.factor_builder import build_factors
 app = Flask(__name__)
 
 # -------------------------------------------------------------------
-# Health check endpoint (SAFE, OPTIONAL, NO LOGIC CHANGE)
+# Health check endpoint (SAFE, OPTIONAL)
 # -------------------------------------------------------------------
 @app.route("/health", methods=["GET"])
 def health():
@@ -35,18 +35,36 @@ def analyze():
             }), 400
 
         # -------------------------------
-        # 2. Build factors (CORE LOGIC)
+        # 2. Extract required fields
         # -------------------------------
-        result = build_factors(data)
+        lat = data.get("lat")
+        lon = data.get("lon")
+        land_use = data.get("land_use")
+
+        # Validate inputs
+        if lat is None or lon is None or land_use is None:
+            return jsonify({
+                "status": "ERROR",
+                "message": "Required fields: lat, lon, land_use"
+            }), 400
 
         # -------------------------------
-        # 3. Return result
+        # 3. Call core engine correctly
+        # -------------------------------
+        result = build_factors(
+            lat=lat,
+            lon=lon,
+            land_use=land_use
+        )
+
+        # -------------------------------
+        # 4. Return result
         # -------------------------------
         return jsonify(result), 200
 
     except Exception as e:
         # -------------------------------
-        # 4. FULL TRACEBACK LOGGING
+        # 5. FULL TRACEBACK LOGGING
         # -------------------------------
         traceback.print_exc()
 
