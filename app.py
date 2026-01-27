@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify
 import traceback
 
 from geo.factor_builder import build_factors
-from geo.arable_classifier import classify_arable_land
+from geo.arable_classifier import is_arable_land
 from engine.rule_engine import apply_icar_rules
 from engine.erosion_risk_engine import compute_erosion_risk
 
 app = Flask(__name__)
 
 # --------------------------------------------------
-# Health check
+# Health check (safe, optional)
 # --------------------------------------------------
 @app.route("/health", methods=["GET"])
 def health():
@@ -40,18 +40,18 @@ def analyze():
         factors = build_factors(lat, lon, land_use)
 
         # --------------------------------------------------
-        # 2. Arability check (LOCKED ICAR LOGIC)
+        # 2. ICAR arability check (LOCKED LOGIC)
         # --------------------------------------------------
-        arability_result = classify_arable_land(
-            latitude=factors.latitude,
-            longitude=factors.longitude,
+        is_arable, reason = is_arable_land(
+            lat=factors.latitude,
+            lon=factors.longitude,
             slope_percent=factors.slope_percent
         )
 
-        if not arability_result["is_arable"]:
+        if not is_arable:
             return jsonify({
                 "status": "NON_ARABLE",
-                "reason": arability_result["reason"],
+                "reason": reason,
                 "message": "System works only for arable agricultural land"
             }), 200
 
@@ -95,5 +95,8 @@ def analyze():
         }), 500
 
 
+# --------------------------------------------------
+# Render-safe entry point
+# --------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
