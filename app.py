@@ -1,81 +1,99 @@
 from flask import Flask, request, jsonify
 import traceback
 
-# Core system import (UNCHANGED)
 from geo.factor_builder import build_factors
+from geo.arable_classifier import classify_arable_land
+from engine.rule_engine import apply_icar_rules
+from engine.erosion_risk_engine import compute_erosion_risk
 
 app = Flask(__name__)
 
-# -------------------------------------------------------------------
-# Health check endpoint (SAFE, OPTIONAL)
-# -------------------------------------------------------------------
+# --------------------------------------------------
+# Health check
+# --------------------------------------------------
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({
-        "status": "UP",
-        "service": "SWC AI Engine"
-    }), 200
+    return jsonify({"status": "UP"}), 200
 
 
-# -------------------------------------------------------------------
-# Main analysis endpoint
-# -------------------------------------------------------------------
+# --------------------------------------------------
+# Main DSS endpoint
+# --------------------------------------------------
 @app.route("/analyze", methods=["POST"])
 def analyze():
     try:
-        # -------------------------------
-        # 1. Read input JSON
-        # -------------------------------
         data = request.get_json(force=True)
 
-        if not data:
-            return jsonify({
-                "status": "ERROR",
-                "message": "Empty JSON body"
-            }), 400
-
-        # -------------------------------
-        # 2. Extract required fields
-        # -------------------------------
         lat = data.get("lat")
         lon = data.get("lon")
         land_use = data.get("land_use")
 
-        # Validate inputs
         if lat is None or lon is None or land_use is None:
             return jsonify({
                 "status": "ERROR",
                 "message": "Required fields: lat, lon, land_use"
             }), 400
 
-        # -------------------------------
-        # 3. Call core engine correctly
-        # -------------------------------
-        result = build_factors(
-            lat=lat,
-            lon=lon,
-            land_use=land_use
+        # --------------------------------------------------
+        # 1. Build raw geophysical factors
+        # --------------------------------------------------
+        factors = build_factors(lat, lon, land_use)
+
+        # --------------------------------------------------
+        # 2. Arability check (LOCKED ICAR LOGIC)
+        # --------------------------------------------------
+        arability_result = classify_arable_land(
+            latitude=factors.latitude,
+            longitude=factors.longitude,
+            slope_percent=factors.slope_percent
         )
 
-        # -------------------------------
-        # 4. Return result
-        # -------------------------------
-        return jsonify(result), 200
+        if not arability_result["is_arable"]:
+            return jsonify({
+                "status": "NON_ARABLE",
+                "reason": arability_result["reason"],
+                "message": "System works only for arable agricultural land"
+            }), 200
+
+        # --------------------------------------------------
+        # 3. Apply ICAR mechanical rules
+        # --------------------------------------------------
+        measures, mode = apply_icar_rules(factors)
+
+        # --------------------------------------------------
+        # 4. Compute erosion risk
+        # --------------------------------------------------
+        erosion_risk = compute_erosion_risk(factors)
+
+        # --------------------------------------------------
+        # 5. Final DSS response
+        # --------------------------------------------------
+        return jsonify({
+            "status": "OK",
+            "mode": mode,
+            "arability": "ARABLE",
+            "location": {
+                "latitude": factors.latitude,
+                "longitude": factors.longitude
+            },
+            "land_use": factors.land_use,
+            "factors": {
+                "slope_percent": factors.slope_percent,
+                "rainfall_mm": factors.rainfall_mm,
+                "soil_depth": factors.soil_depth,
+                "drainage": factors.drainage
+            },
+            "erosion_risk": erosion_risk,
+            "recommended_measures": measures
+        }), 200
 
     except Exception as e:
-        # -------------------------------
-        # 5. FULL TRACEBACK LOGGING
-        # -------------------------------
         traceback.print_exc()
-
         return jsonify({
             "status": "ERROR",
             "error": str(e)
         }), 500
 
 
-# -------------------------------------------------------------------
-# Application entry point (RENDER SAFE)
-# -------------------------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
