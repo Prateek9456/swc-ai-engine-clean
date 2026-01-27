@@ -1,15 +1,26 @@
 from flask import Flask, request, jsonify
 import traceback
+import os
 
 from geo.factor_builder import build_factors
 from geo.arable_classifier import is_arable_land
-from engine.rule_engine import apply_icar_rules
+from engine.rule_engine import evaluate_rules
 from engine.erosion_risk_engine import compute_erosion_risk
 
 app = Flask(__name__)
 
 # --------------------------------------------------
-# Health check (safe, optional)
+# Paths (ICAR rule table)
+# --------------------------------------------------
+BASE_DIR = os.path.dirname(__file__)
+ICAR_RULE_FILE = os.path.join(
+    BASE_DIR,
+    "rules",
+    "icar_table_4_1_mechanical_measures.json"
+)
+
+# --------------------------------------------------
+# Health check
 # --------------------------------------------------
 @app.route("/health", methods=["GET"])
 def health():
@@ -56,9 +67,15 @@ def analyze():
             }), 200
 
         # --------------------------------------------------
-        # 3. Apply ICAR mechanical rules
+        # 3. Apply ICAR mechanical rules (Table 4.1)
         # --------------------------------------------------
-        measures, mode = apply_icar_rules(factors)
+        rule_result = evaluate_rules(
+            factors=factors,
+            rule_file=ICAR_RULE_FILE
+        )
+
+        mode = rule_result["mode"]
+        measures = rule_result["measures"]
 
         # --------------------------------------------------
         # 4. Compute erosion risk
