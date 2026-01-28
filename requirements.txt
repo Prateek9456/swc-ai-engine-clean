@@ -1,2 +1,6 @@
 requests
 python-dotenv
+flask==3.0.0
+flask-cors
+numpy
+
