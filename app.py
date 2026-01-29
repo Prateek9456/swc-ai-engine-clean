@@ -1,3 +1,7 @@
+from geo.bootstrap_landcover import ensure_landcover_data
+ensure_landcover_data()
+
+
 from flask import Flask, request, jsonify
 
 from geo.factor_builder import build_factors
