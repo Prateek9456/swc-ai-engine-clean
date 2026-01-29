@@ -2,15 +2,19 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy only Spring Boot backend
-COPY springboot-backend/ .
+# Copy everything from repo
+COPY . .
 
-# Fix permission
-RUN chmod +x mvnw
+# Make mvnw executable if it exists
+RUN chmod +x mvnw || true
 
-# Build jar
-RUN ./mvnw clean package -DskipTests
+# Build only if pom.xml exists
+RUN if [ -f pom.xml ]; then \
+      ./mvnw clean package -DskipTests; \
+    else \
+      cd */ && ./mvnw clean package -DskipTests; \
+    fi
 
 EXPOSE 10000
 
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["sh", "-c", "java -jar $(find . -name '*.jar' | head -n 1)"]
