@@ -13,7 +13,7 @@ public class PythonAiClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // ✅ Flask URL injected from environment (Render-safe)
+    // ✅ Inject Flask URL from environment
     @Value("${python.ai.base-url}")
     private String flaskUrl;
 
@@ -22,18 +22,14 @@ public class PythonAiClient {
             Double lon,
             String landUse
     ) {
+        String url = flaskUrl + "/analyze";
 
-        // 🔥 LOG VALUES BEFORE SENDING
-        System.out.println("PYTHON PAYLOAD VALUES:");
-        System.out.println("lat = " + lat);
-        System.out.println("lon = " + lon);
-        System.out.println("landUse = " + landUse);
-        System.out.println("Calling Flask URL: " + flaskUrl);
+        System.out.println("CALLING FLASK URL: " + url);
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("lat", lat);
         payload.put("lon", lon);
-        payload.put("land_use", landUse); // MUST be snake_case
+        payload.put("land_use", landUse);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -42,11 +38,7 @@ public class PythonAiClient {
                 new HttpEntity<>(payload, headers);
 
         ResponseEntity<Map> response =
-                restTemplate.postForEntity(
-                        flaskUrl,
-                        entity,
-                        Map.class
-                );
+                restTemplate.postForEntity(url, entity, Map.class);
 
         return response.getBody();
     }
