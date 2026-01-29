@@ -1,6 +1,7 @@
 package com.icar.swc.config;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.icar.swc.entity.User;
 import com.icar.swc.repository.UserRepository;
@@ -16,6 +20,10 @@ import com.icar.swc.security.JwtService;
 
 @Configuration
 public class SecurityConfig {
+
+    // 🔴 CHANGE THIS TO YOUR REAL VERCEL URL
+    private static final String FRONTEND_URL =
+            "https://your-frontend.vercel.app";
 
     private final JwtService jwtService;
     private final JwtAuthFilter jwtAuthFilter;
@@ -35,29 +43,28 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // ✅ APIs are stateless
+            // ✅ API only — no sessions, no CSRF
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             .authorizeHttpRequests(auth -> auth
-                // ✅ PUBLIC / AUTH ROUTES
+                // ✅ PUBLIC ROUTES
                 .requestMatchers(
                     "/",
-                    "/login",
-                    "/register",
+                    "/error",
                     "/auth/**",
                     "/oauth2/**",
-                    "/login/oauth2/**",
-                    "/error"
+                    "/login/oauth2/**"
                 ).permitAll()
 
-                // ✅ VERY IMPORTANT: ALLOW ALL API CALLS
+                // ✅ FRONTEND → BACKEND API
                 .requestMatchers("/api/**").permitAll()
 
-                // 🔐 Everything else requires authentication
+                // 🔐 Everything else protected
                 .anyRequest().authenticated()
             )
 
-            // ✅ GOOGLE LOGIN (UI ONLY)
+            // ✅ GOOGLE OAUTH
             .oauth2Login(oauth2 -> oauth2
                 .successHandler((request, response, authentication) -> {
 
@@ -70,7 +77,6 @@ public class SecurityConfig {
                         .orElseGet(() -> {
                             User u = new User();
                             u.setUsername(email);
-                            u.setPassword(null);
                             u.setProvider("GOOGLE");
                             u.setRole("USER");
                             u.setCreatedAt(LocalDateTime.now());
@@ -80,13 +86,14 @@ public class SecurityConfig {
                     String token =
                             jwtService.generateToken(user.getUsername());
 
+                    // 🔥 REDIRECT TO FRONTEND WITH TOKEN
                     response.sendRedirect(
-                        "http://localhost:3000/oauth-success?token=" + token
+                        FRONTEND_URL + "/oauth-success?token=" + token
                     );
                 })
             )
 
-            // ✅ JWT FILTER (for protected routes)
+            // ✅ JWT FILTER
             .addFilterBefore(
                 jwtAuthFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -94,10 +101,27 @@ public class SecurityConfig {
 
             // ✅ LOGOUT
             .logout(logout -> logout
-                .logoutSuccessUrl("http://localhost:3000/login")
+                .logoutSuccessUrl(FRONTEND_URL + "/login")
                 .permitAll()
             );
 
         return http.build();
+    }
+
+    // 🔥 REQUIRED FOR VERCEL → RENDER CALLS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(FRONTEND_URL));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
