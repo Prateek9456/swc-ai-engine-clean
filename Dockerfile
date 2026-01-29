@@ -2,13 +2,13 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy only backend source
+# Copy backend source
 COPY springboot-backend/ .
 
-# Build the JAR inside Docker
+# Build the jar inside Docker
 RUN ./mvnw clean package -DskipTests
 
-# Copy the built jar
+# Rename jar
 RUN cp target/*.jar app.jar
 
 EXPOSE 10000
