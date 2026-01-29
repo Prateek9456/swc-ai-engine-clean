@@ -21,9 +21,9 @@ import com.icar.swc.security.JwtService;
 @Configuration
 public class SecurityConfig {
 
-    // 🔴 CHANGE THIS TO YOUR REAL VERCEL URL
+    // ✅ YOUR REAL FRONTEND URL
     private static final String FRONTEND_URL =
-            "https://your-frontend.vercel.app";
+            "https://swc-ai-engine-clean.vercel.app";
 
     private final JwtService jwtService;
     private final JwtAuthFilter jwtAuthFilter;
@@ -43,12 +43,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // ✅ API only — no sessions, no CSRF
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             .authorizeHttpRequests(auth -> auth
-                // ✅ PUBLIC ROUTES
+                // ✅ PUBLIC
                 .requestMatchers(
                     "/",
                     "/error",
@@ -57,14 +56,13 @@ public class SecurityConfig {
                     "/login/oauth2/**"
                 ).permitAll()
 
-                // ✅ FRONTEND → BACKEND API
+                // ✅ FRONTEND → BACKEND APIs
                 .requestMatchers("/api/**").permitAll()
 
-                // 🔐 Everything else protected
                 .anyRequest().authenticated()
             )
 
-            // ✅ GOOGLE OAUTH
+            // ✅ GOOGLE LOGIN
             .oauth2Login(oauth2 -> oauth2
                 .successHandler((request, response, authentication) -> {
 
@@ -86,7 +84,7 @@ public class SecurityConfig {
                     String token =
                             jwtService.generateToken(user.getUsername());
 
-                    // 🔥 REDIRECT TO FRONTEND WITH TOKEN
+                    // 🔥 SEND TOKEN TO FRONTEND
                     response.sendRedirect(
                         FRONTEND_URL + "/oauth-success?token=" + token
                     );
@@ -108,9 +106,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 🔥 REQUIRED FOR VERCEL → RENDER CALLS
+    // 🔥 REQUIRED FOR VERCEL → RENDER
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(FRONTEND_URL));
