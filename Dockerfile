@@ -2,14 +2,17 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy everything
+# Copy project files
 COPY . .
+
+# 🔥 FIX PERMISSION ISSUE
+RUN chmod +x mvnw
 
 # Build the jar
 RUN ./mvnw clean package -DskipTests
 
-# Expose Render port
+# Render uses dynamic port
 EXPOSE 10000
 
-# Run app
+# Run Spring Boot
 CMD ["java", "-jar", "target/*.jar"]
