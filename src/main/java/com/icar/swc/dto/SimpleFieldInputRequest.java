@@ -1,9 +1,13 @@
 package com.icar.swc.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SimpleFieldInputRequest {
 
     private Double lat;
     private Double lon;
+
+    @JsonProperty("land_use") // 👈 THIS IS THE FIX
     private String landUse;
 
     public Double getLat() {
